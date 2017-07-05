@@ -1,4 +1,6 @@
-const EthAccount = require("./ethereum");
+const BaseAccount = require("./baseaccount");
+const units = require("./units.json");
+const console = require('better-console');
 
 go();
 
@@ -7,16 +9,23 @@ go();
 // another out to Bruce (25 + 0.01)
 
 async function go() {
+    // TODO: fix case-sensitivity thoughtfully
     const ethMap = {
-        "0xe2536c77a54bd722ddd3935b900ad079d70f4568": "Chris",
+        "0xe2536c77a54bd722ddd3935b900ad079d70f4568": "Jaxx Ethereum Wallet (Chris)",
         "0xb12464e18f12cca3d19589563118b2b11a3ff30b": "David",
         "0x0000000000000000000000000000000000000000": "Gas",
         "0x70faa28a6b8d6829a4b1e649d26ec9a2a39ba413": "Shapeshift",
-        "0x6643aa4c023eb75d34222d785ff127319c1ea4b9": "Ethereum Wallet"
+        "0x6643aa4c023eb75d34222d785ff127319c1ea4b9": "Ethereum Wallet",
+        "19tuqy48r6epy9ve5uhp3beccq3fkmq5ad": "Jaxx Bitcoin Wallet (Chris)",
+        "1jcmnu9jy34fce9bksirppixndwhrh1hn9": "Jaxx Bitcoin Wallet (Chris)",
+        "1crxctjgoxwrdnj8tt8khhtohkqfkktymm": "Jaxx Bitcoin Wallet (Chris)",
+        "18t9peobvjbflyxj13erz7lwselwnbsaxy": "Jaxx Bitcoin Wallet (Chris)",
+        "17wc1sffucyrmbxvlek3ca2vjxfllhfiqt": "Jaxx Bitcoin Wallet (Chris)",
+        "13man3dasnbhfn1bkcip3tlxic3kzr3jwo": "Jaxx Bitcoin Wallet (Chris)",
     };
 
     try {
-        const mainEth = new EthAccount("0xe2536c77a54bd722ddd3935b900ad079d70f4568");
+        const mainEth = BaseAccount.make("ETH", "0xe2536c77a54bd722ddd3935b900ad079d70f4568");
         const txns    = await mainEth.getTxns(2, ["0xb12464e18f12cca3d19589563118b2b11a3ff30b", "0x70faa28a6b8d6829a4b1e649d26ec9a2a39ba413"]);
 
         simplify(txns); // mutates the original txns because screw it
@@ -28,14 +37,14 @@ async function go() {
         });
         // const balanceSheet = await ethereum.getTxns(ethMap);
 
-        console.log(txns.map(t => {
+        console.table(txns.map(t => {
             let vString = "";
             if (t.fromType === t.toType) {
-                vString = `${t.fromValue} ${t.fromType}`
+                vString = `${t.fromValue / units[t.fromType]} ${t.fromType}`
             } else {
-                vString = `${t.fromValue}  ${t.fromType} / ${t.toValue} ${t.toType}`
+                vString = `${t.fromValue / units[t.fromType]}  ${t.fromType} / ${t.toValue / units[t.toType]} ${t.toType}`
             }
-            return `${t.from} -(${vString})-> ${t.to}`
+            return [t.time, t.from, vString, t.to]
         }))
     } catch (e) {
         console.error(e);

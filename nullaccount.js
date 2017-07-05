@@ -1,13 +1,3 @@
-module.exports = class Account {
-    constructor(address) {
-        this.address = address;
-    }
+module.exports = BaseAccount => class NullAccount extends BaseAccount {
 
-    matches(otherAddress) {
-        return this.address.toLowerCase() === otherAddress.toLowerCase()
-    }
-
-    async getTxns() {
-        return Promise.resolve([]);
-    }
 };
